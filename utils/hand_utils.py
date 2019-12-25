@@ -1,7 +1,7 @@
 import torch
 import cv2
 
-from hand_detection.models.handboxes import HandBoxes
+from cvauth.hand_detection.models.handboxes import HandBoxes
 
 
 def check_keys(model, pretrained_state_dict):

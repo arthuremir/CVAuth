@@ -7,10 +7,10 @@ import torch
 from PIL import Image
 
 
-from hand_detection.data import cfg as hand_cfg
-from hand_detection.layers.functions.prior_box import PriorBox
-from hand_detection.utils.box_utils import decode
-from hand_detection.utils.py_cpu_nms import py_cpu_nms as nms
+from cvauth.hand_detection.data.config import cfg as hand_cfg
+from cvauth.hand_detection.layers.functions.prior_box import PriorBox
+from cvauth.hand_detection.utils.box_utils import decode
+from cvauth.hand_detection.utils.py_cpu_nms import py_cpu_nms as nms
 
 
 def detect_hands(frame, localizer, device, args):

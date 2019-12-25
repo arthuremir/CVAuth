@@ -6,9 +6,7 @@ import os
 import time
 from datetime import datetime
 
-import cv2
 import numpy as np
-import tqdm
 from PIL import Image
 
 from detectron2.config import get_cfg as get_detectron_cfg
@@ -20,7 +18,7 @@ from arcface.mtcnn import MTCNN
 from arcface.mtcnn_pytorch.src.visualization_utils import show_bboxes
 from arcface.utils import load_facebank, draw_box_name, prepare_facebank, get_facebank_names
 
-from hand_detection.data import cfg as hand_cfg
+from cvauth.hand_detection.data import cfg as hand_cfg
 from hand_detection.layers.functions.prior_box import PriorBox
 from hand_detection.utils.box_utils import decode
 from hand_detection.utils.py_cpu_nms import py_cpu_nms as nms

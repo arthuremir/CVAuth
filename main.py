@@ -10,13 +10,13 @@ from tkinter import Tk, Label, StringVar, Entry, Button
 import PIL
 import numpy as np
 from PIL import Image, ImageTk
-from detectron2.utils.logger import setup_logger
+from cvauth.detectron2.detectron2.utils.logger import setup_logger
 
-from arcface.config import get_config
-from arcface.learner import FaceLearner
-from arcface.mtcnn import MTCNN
-from arcface.mtcnn_pytorch.src.visualization_utils import show_bboxes
-from arcface.utils import load_facebank, prepare_facebank, get_facebank_names
+from cvauth.arcface.config import get_config
+from cvauth.arcface.learner import FaceLearner
+from cvauth.arcface.mtcnn import MTCNN
+from cvauth.arcface.mtcnn_pytorch.src.visualization_utils import show_bboxes
+from cvauth.arcface.utils import load_facebank, prepare_facebank, get_facebank_names
 from utils.detect import detect_hands, detect_faces
 from utils.face_utils import *
 from utils.hand_utils import *
@@ -49,7 +49,7 @@ def get_args():
 
     parser.add_argument(
         "--config-file",
-        default="detectron2/configs/COCO-Keypoints/keypoint_rcnn_R_50_FPN_3x.yaml",
+        default="cvauth/detectron2/configs/COCO-Keypoints/keypoint_rcnn_R_50_FPN_3x.yaml",
         metavar="FILE",
         help="path to config file",
     )
@@ -66,7 +66,7 @@ def get_args():
         nargs=argparse.REMAINDER,
     )
 
-    parser.add_argument('-m', '--trained_model', default='hand_detection/weights/Final_HandBoxes.pth',
+    parser.add_argument('-m', '--trained_model', default='cvauth/hand_detection/weights/Final_HandBoxes.pth',
                         type=str, help='Trained state_dict file path to open')
     parser.add_argument('--cpu', action="store_true", default=False, help='Use cpu inference')
 

@@ -1,4 +1,4 @@
-from arcface.utils import draw_box_name
+from cvauth.arcface.utils import draw_box_name
 
 
 def visualize_face(vis, faces, names, args_score):

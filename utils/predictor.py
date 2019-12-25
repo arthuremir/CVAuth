@@ -6,10 +6,10 @@ from collections import deque
 
 import cv2
 import torch
-from detectron2.data import MetadataCatalog
-from detectron2.engine.defaults import DefaultPredictor
-from detectron2.utils.video_visualizer import VideoVisualizer
-from detectron2.utils.visualizer import ColorMode, Visualizer
+from cvauth.detectron2.detectron2.data import MetadataCatalog
+from cvauth.detectron2.detectron2.engine.defaults import DefaultPredictor
+from cvauth.detectron2.detectron2.utils.video_visualizer import VideoVisualizer
+from cvauth.detectron2.detectron2.utils.visualizer import ColorMode, Visualizer
 
 
 class VisualizationDemo(object):

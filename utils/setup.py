@@ -1,4 +1,4 @@
-from detectron2.config import get_cfg as get_detectron_cfg
+from cvauth.detectron2.detectron2.config import get_cfg as get_detectron_cfg
 
 def setup_detectron_cfg(args):
     detectron_cfg = get_detectron_cfg()
