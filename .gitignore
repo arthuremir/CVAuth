@@ -1,15 +1,17 @@
+#arcface weights
 cvauth/arcface/work_space/save/*
 !cvauth/arcface/work_space/save/.gitkeep
 
-cvauth/detectron2/configs/COCO-Keypoints/resnet_50_3x.pkl
-
-cvauth/hand_detection/weights/*
-!cvauth/hand_detection/weights/.gitkeep
-
-
+#arcface facebank
 cvauth/arcface/data/facebank/*
 !cvauth/arcface/data/facebank/.gitkeep
 
+#detectron weights
+cvauth/detectron2/configs/COCO-Keypoints/resnet_50_3x.pkl
+
+#hand detection weights
+cvauth/hand_detection/weights/*
+!cvauth/hand_detection/weights/.gitkeep
 
 .idea
 
