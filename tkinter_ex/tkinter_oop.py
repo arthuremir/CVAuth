@@ -56,6 +56,10 @@ class PageOne(tk.Frame):
                            command=lambda: controller.show_frame("StartPage"))
         button.pack()
 
+        '''button = tk.Button(text="Sign in",
+                           command=lambda: controller.show_frame("AuthFrame"))
+        button.pack()'''
+
 
 class PageTwo(tk.Frame):
 
