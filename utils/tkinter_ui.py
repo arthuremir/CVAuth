@@ -5,6 +5,10 @@ from PIL import Image, ImageTk
 
 import cv2
 
+from cvauth.arcface.config import get_config
+from cvauth.arcface.utils import get_facebank_names
+
+from utils.visualizer import Visualizer
 
 # TODO fix titles
 
@@ -60,10 +64,15 @@ class StartPage(tk.Frame):
         self.configure(background='#2D303D')
         self.controller.title("CVAuth")
 
-        message = StringVar()
+        conf = get_config(False)
+
+        facebank_path = conf.facebank_path
+        self.facebank_names = get_facebank_names(facebank_path)
+
+        self.message = StringVar()
 
         message_entry = Entry(self,
-                              textvariable=message,
+                              textvariable=self.message,
                               bd=0,
                               highlightthickness=0,
                               background="#21232d",
@@ -72,6 +81,8 @@ class StartPage(tk.Frame):
                               font=('Verdana', 30))
         message_entry.place(relx=.5, rely=.2, anchor="c")
         message_entry.focus()
+
+        global if_face, if_pose, if_hand
 
         if_face = tk.IntVar()
         face_chk = tk.Checkbutton(self,
@@ -112,7 +123,7 @@ class StartPage(tk.Frame):
 
         button_signin = Button(self,
                                text="Sign in",
-                               command=lambda: self.controller.show_frame("AuthPage"),
+                               command=lambda: self.process_name(),
                                bd=0,
                                highlightthickness=0,
                                background="#21232d",
@@ -135,6 +146,15 @@ class StartPage(tk.Frame):
                                pady="10",
                                font="16")
         button_signup.place(relx=.71, rely=.55, anchor="c")
+
+    def process_name(self):
+        global username
+        username = self.message.get().lower()
+        if username in self.facebank_names:
+            self.controller.show_frame("AuthPage")
+        else:
+            self.controller.title("Wrong name")
+
 
 
 class AuthPage(tk.Frame):
@@ -163,20 +183,25 @@ class AuthPage(tk.Frame):
     def init_capture(self):
         self.cap = cv2.VideoCapture(0)
         self.stop_flag = 0
+
+        self.visualizer = Visualizer(if_face=if_face,
+                                     if_pose=if_pose,
+                                     if_hand=if_hand)
+
         self.update_cam()
 
     def update_cam(self):
         _, frame = self.cap.read()
-        frame = cv2.flip(frame, 1)
-        cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
-        img = Image.fromarray(cv2image)
+        vis = self.visualizer.run(frame)
+
+        img = Image.fromarray(vis)
         img_tk = ImageTk.PhotoImage(image=img)
         self.cam_wrapper.imgtk = img_tk
         self.cam_wrapper.configure(image=img_tk)
         if self.stop_flag:
             self.disable_frame()
             return
-        self.cam_wrapper.after(10, self.update_cam)
+        self.cam_wrapper.after(1, self.update_cam)
 
     def raise_stop_flag(self):
         self.stop_flag = 1
