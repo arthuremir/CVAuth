@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 from cvauth.arcface.config import get_config
 from cvauth.arcface.learner import FaceLearner
 from cvauth.arcface.mtcnn import MTCNN
@@ -9,6 +12,8 @@ from utils.detectors import *
 from utils.face_utils import *
 from utils.hand_utils import *
 
+SAVE_FOLDER = Path('cvauth/arcface/data/facebank')
+DIRTY_FLAG = SAVE_FOLDER / ".dirty"
 
 def load_face_rec(conf, args):
     detector = MTCNN()
@@ -20,9 +25,10 @@ def load_face_rec(conf, args):
         learner.load_state(conf, 'final.pth', True, True)
     learner.model.eval()
 
-    if args.update:
+    if args.update or os.path.exists(DIRTY_FLAG):
         targets, names = prepare_facebank(conf, learner.model, detector, tta=args.tta)
         print('Facebank is updated!')
+        os.remove(DIRTY_FLAG)
     else:
         targets, names = load_facebank(conf)
         print('Facebank is loaded!')

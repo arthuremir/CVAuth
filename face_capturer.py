@@ -6,13 +6,13 @@ from pathlib import Path
 
 import numpy as np
 
-from arcface.mtcnn import MTCNN
+from cvauth.arcface.mtcnn import MTCNN
 
 parser = argparse.ArgumentParser(description='take a picture')
 parser.add_argument('--name', '-n', default='unknown', type=str, help='input the name of the recording person')
 args = parser.parse_args()
 
-data_path = Path('data')
+data_path = Path('cvauth/arcface/data')
 save_path = data_path / 'facebank' / args.name
 if not save_path.exists():
     save_path.mkdir()

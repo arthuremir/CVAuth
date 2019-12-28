@@ -1,3 +1,4 @@
+#import gc
 import tkinter as tk
 from tkinter import font
 from tkinter import Label, StringVar, Entry, Button
@@ -9,6 +10,8 @@ from cvauth.arcface.config import get_config
 from cvauth.arcface.utils import get_facebank_names
 
 from utils.visualizer import Visualizer
+from utils.registrator import Registrator
+
 
 # TODO fix titles
 
@@ -44,7 +47,7 @@ class MainApp(tk.Tk):
 
         if page_name in self.frames:
             self.frames[page_name].tkraise()
-            if page_name == "AuthPage":
+            if page_name == "AuthPage" or page_name == "RegisterPage":
                 self.frames[page_name].init_capture()
         else:
             # TODO refactor this
@@ -123,7 +126,7 @@ class StartPage(tk.Frame):
 
         button_signin = Button(self,
                                text="Sign in",
-                               command=lambda: self.process_name(),
+                               command=self.process_name,
                                bd=0,
                                highlightthickness=0,
                                background="#21232d",
@@ -136,7 +139,8 @@ class StartPage(tk.Frame):
 
         button_signup = Button(self,
                                text="Sign up",
-                               command=lambda: self.controller.show_frame("RegisterPage"),
+                               command=self.register_user,
+                               # command=lambda: self.controller.show_frame("RegisterPage"),
                                bd=0,
                                highlightthickness=0,
                                background="#21232d",
@@ -155,6 +159,15 @@ class StartPage(tk.Frame):
         else:
             self.controller.title("Wrong name")
 
+    def register_user(self):
+        global username
+        username = self.message.get().lower()
+        if username in self.facebank_names:
+            self.controller.title("This user already exists!")
+        elif username.strip():
+            self.controller.show_frame("RegisterPage")
+        else:
+            self.controller.title("Invalid name")
 
 
 class AuthPage(tk.Frame):
@@ -178,15 +191,15 @@ class AuthPage(tk.Frame):
                             font="16")
         button_int.place(relx=0.04, rely=0.961, anchor="c")
 
+        self.visualizer = Visualizer(if_face=if_face,
+                                     if_pose=if_pose,
+                                     if_hand=if_hand)
+
         self.init_capture()
 
     def init_capture(self):
         self.cap = cv2.VideoCapture(0)
         self.stop_flag = 0
-
-        self.visualizer = Visualizer(if_face=if_face,
-                                     if_pose=if_pose,
-                                     if_hand=if_hand)
 
         self.update_cam()
 
@@ -208,6 +221,9 @@ class AuthPage(tk.Frame):
 
     def disable_frame(self):
         self.cap.release()
+
+        # gc.collect()
+
         self.controller.show_frame("StartPage")
 
 
@@ -216,8 +232,67 @@ class RegisterPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        label = tk.Label(self, text="This is page 2", font=controller.title_font)
-        label.pack(side="top", fill="x", pady=10)
-        button = tk.Button(self, text="Go to the start page",
-                           command=lambda: controller.show_frame("StartPage"))
-        button.pack()
+
+        self.cam_wrapper = Label(self)
+        self.cam_wrapper.pack()
+
+        button_int = Button(self,
+                            text="X",
+                            command=self.raise_stop_flag,
+                            bd=0,
+                            highlightthickness=0,
+                            background="#C60000",
+                            foreground="#ffffff",
+                            padx="20",
+                            pady="10",
+                            font="16")
+        button_int.place(relx=0.04, rely=0.961, anchor="c")
+
+        button_cap = Button(self,
+                            text="Take a photo",
+                            command=self.raise_capture_flag,
+                            bd=0,
+                            highlightthickness=0,
+                            background="green",
+                            foreground="#ffffff",
+                            padx="20",
+                            pady="10",
+                            font="16")
+        button_cap.place(relx=0.2, rely=0.961, anchor="c")
+
+        self.registrator = Registrator(username)
+
+        self.init_capture()
+
+    def init_capture(self):
+        self.cap = cv2.VideoCapture(0)
+        self.stop_flag = 0
+        self.capture_flag = 0
+
+        self.update_cam()
+
+    def update_cam(self):
+        _, frame = self.cap.read()
+
+        vis = self.registrator.run(frame, self.capture_flag)
+        self.capture_flag = 0
+
+        img = Image.fromarray(vis[..., ::-1])
+        img_tk = ImageTk.PhotoImage(image=img)
+        self.cam_wrapper.imgtk = img_tk
+        self.cam_wrapper.configure(image=img_tk)
+        if self.stop_flag:
+            self.disable_frame()
+            return
+        self.cam_wrapper.after(1, self.update_cam)
+
+    def raise_stop_flag(self):
+        self.stop_flag = 1
+
+    def raise_capture_flag(self):
+        self.capture_flag = 1
+
+    def disable_frame(self):
+        self.cap.release()
+
+        self.controller.show_frame("StartPage")
