@@ -7,7 +7,6 @@ from cvauth.arcface.mtcnn import MTCNN
 from cvauth.arcface.utils import load_facebank, prepare_facebank
 from utils.predictor import VisualizationDemo
 from utils.setup_detectron import setup_detectron_cfg
-from utils.arg_parser import get_args
 from utils.detectors import *
 from utils.face_utils import *
 from utils.hand_utils import *
@@ -47,14 +46,14 @@ def load_hand_rec(args, device):
 
 class Visualizer:
 
-    def __init__(self, if_face, if_pose, if_hand):
+    def __init__(self, args, if_face, if_pose, if_hand):
         self.if_face = if_face.get()
         self.if_pose = if_pose.get()
         self.if_hand = if_hand.get()
 
         self.conf = get_config(False)
 
-        self.args = get_args()
+        self.args = args
 
         if self.if_face:
             self.detector, self.learner, self.targets, self.names = load_face_rec(self.conf, self.args)

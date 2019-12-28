@@ -1,16 +1,18 @@
-#import gc
+import time
 import tkinter as tk
 from tkinter import font
-from tkinter import Label, StringVar, Entry, Button
+from tkinter import Label, StringVar, Entry, Button, IntVar
 from PIL import Image, ImageTk
 
 import cv2
 
+from utils.arg_parser import get_args
 from cvauth.arcface.config import get_config
 from cvauth.arcface.utils import get_facebank_names
 
 from utils.visualizer import Visualizer
 from utils.registrator import Registrator
+from utils.fps_plt import add_fps_plot
 
 
 # TODO fix titles
@@ -20,6 +22,8 @@ class MainApp(tk.Tk):
 
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
+
+        self.args = get_args()
 
         self.bind('<Escape>', lambda e: self.quit())
 
@@ -38,7 +42,7 @@ class MainApp(tk.Tk):
         self.geometry("{}x{}+{}+{}".format(window_size[0], window_size[1], x_shift, y_shift))
 
         self.frames = dict()
-        self.frames["StartPage"] = StartPage(parent=self.container, controller=self)
+        self.frames["StartPage"] = StartPage(args=self.args, parent=self.container, controller=self)
         self.frames["StartPage"].grid(row=0, column=0, sticky="nsew")
 
         self.show_frame("StartPage")
@@ -51,7 +55,7 @@ class MainApp(tk.Tk):
                 self.frames[page_name].init_capture()
         else:
             # TODO refactor this
-            frame = globals()[page_name](parent=self.container, controller=self)
+            frame = globals()[page_name](args=self.args, parent=self.container, controller=self)
 
             self.frames[page_name] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -60,7 +64,7 @@ class MainApp(tk.Tk):
 
 class StartPage(tk.Frame):
 
-    def __init__(self, parent, controller):
+    def __init__(self, args, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
@@ -172,16 +176,21 @@ class StartPage(tk.Frame):
 
 class AuthPage(tk.Frame):
 
-    def __init__(self, parent, controller):
+    def __init__(self, args, parent, controller):
         tk.Frame.__init__(self, parent)
+        self.args = args
+
         self.controller = controller
 
         self.cam_wrapper = Label(self)
         self.cam_wrapper.pack()
+        self.fps_arr = list(range(1, 6))
+        self.frame_num = 1
+        self.time_last = time.time()
 
         button_int = Button(self,
                             text="X",
-                            command=lambda: self.raise_stop_flag(),
+                            command=self.raise_stop_flag,
                             bd=0,
                             highlightthickness=0,
                             background="#C60000",
@@ -191,7 +200,12 @@ class AuthPage(tk.Frame):
                             font="16")
         button_int.place(relx=0.04, rely=0.961, anchor="c")
 
-        self.visualizer = Visualizer(if_face=if_face,
+        self.fps = IntVar()
+        self.fps_label = Label(self, textvariable=self.fps, font=('Verdana', 15))
+        self.fps_label.place(relx=0.95, rely=0.961, anchor="c")
+
+        self.visualizer = Visualizer(self.args,
+                                     if_face=if_face,
                                      if_pose=if_pose,
                                      if_hand=if_hand)
 
@@ -204,8 +218,22 @@ class AuthPage(tk.Frame):
         self.update_cam()
 
     def update_cam(self):
+
+        # ----- fps tracking--------------------------
+        # ----- every 0.2s output fps of last 5 frames
+        if time.time() - self.time_last > 0.2:
+            delta = self.fps_arr[self.frame_num - 1] - self.fps_arr[self.frame_num]
+            self.fps.set(round(5 / delta))
+            self.time_last = time.time()
+
+        self.fps_arr[self.frame_num % 5] = time.time()
+        self.frame_num = (self.frame_num + 1) % 5
+        # --------------------------------------------
+
         _, frame = self.cap.read()
         vis = self.visualizer.run(frame)
+
+        # vis = add_fps_plot(vis)
 
         img = Image.fromarray(vis)
         img_tk = ImageTk.PhotoImage(image=img)
@@ -222,14 +250,12 @@ class AuthPage(tk.Frame):
     def disable_frame(self):
         self.cap.release()
 
-        # gc.collect()
-
         self.controller.show_frame("StartPage")
 
 
 class RegisterPage(tk.Frame):
 
-    def __init__(self, parent, controller):
+    def __init__(self, args, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 

@@ -49,4 +49,6 @@ def get_args():
     parser.add_argument('--nms_threshold', default=0.2, type=float, help='nms_threshold')
     parser.add_argument('--keep_top_k', default=750, type=int, help='keep_top_k')
 
+    #parser.add_argument('--fps', default=True, type=int, help='keep_top_k')
+
     return parser.parse_args()
