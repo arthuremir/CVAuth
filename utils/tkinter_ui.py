@@ -204,6 +204,16 @@ class AuthPage(tk.Frame):
         self.fps_label = Label(self, textvariable=self.fps, font=('Verdana', 15))
         self.fps_label.place(relx=0.95, rely=0.961, anchor="c")
 
+        '''self.visualizer = Visualizer(self.args,
+                                     if_face=1,
+                                     if_pose=1,
+                                     if_hand=0)'''
+
+        # ------------
+        if_face.set(1)
+        if_hand.set(0)
+        # ------------
+
         self.visualizer = Visualizer(self.args,
                                      if_face=if_face,
                                      if_pose=if_pose,
@@ -214,6 +224,11 @@ class AuthPage(tk.Frame):
     def init_capture(self):
         self.cap = cv2.VideoCapture(0)
         self.stop_flag = 0
+
+        self.pos_face_cnt = 0
+        self.neg_face_cnt = 0
+
+        self.face_res = 0
 
         self.update_cam()
 
@@ -231,7 +246,30 @@ class AuthPage(tk.Frame):
         # --------------------------------------------
 
         _, frame = self.cap.read()
-        vis = self.visualizer.run(frame)
+        frame = cv2.flip(frame, 1)
+
+        vis, face_status = self.visualizer.run(frame, username)
+
+        if not self.face_res:
+
+            if face_status == 1:
+                self.pos_face_cnt += 1
+            elif face_status == -1:
+                self.neg_face_cnt += 1
+
+            if self.neg_face_cnt == 3:
+                self.raise_stop_flag()
+                self.controller.title("Wrong person!")
+            elif self.pos_face_cnt == 3:
+                self.face_res = 1
+                self.pos_face_cnt = None
+                self.visualizer.if_face = 0
+                self.visualizer.if_hand = 1
+                self.controller.title("Let's start gesture verification step!")
+                #self.visualizer.init_hand()
+
+        else:
+            pass
 
         # vis = add_fps_plot(vis)
 

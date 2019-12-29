@@ -60,9 +60,9 @@ def detect_hands(frame, localizer, device, args):
 def detect_faces(frame, detector, conf, learner, targets, tta):
     image = Image.fromarray(frame[..., ::-1])
 
-    time_detect_init = time.time()
+    #time_detect_init = time.time()
     aligned_faces = detector.align_multi(image, conf.face_limit, conf.min_face_size)
-    time_detect = time.time() - time_detect_init
+    #time_detect = time.time() - time_detect_init
 
     if aligned_faces is None:
         return None
@@ -71,8 +71,8 @@ def detect_faces(frame, detector, conf, learner, targets, tta):
     bboxes = bboxes.astype(int)
     bboxes = bboxes + [-1, -1, 1, 1]
 
-    time_classif_init = time.time()
+    #time_classif_init = time.time()
     results, score = learner.infer(conf, faces, targets, tta)
-    time_classif = time.time() - time_classif_init
+    #time_classif = time.time() - time_classif_init
 
-    return [bboxes, results, score], [time_detect, time_classif]
+    return [bboxes, results, score]#, [time_detect, time_classif]
