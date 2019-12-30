@@ -116,7 +116,7 @@ class Visualizer:
                 if self.num_frames == 1:
                     print("[STATUS] please wait! calibrating...")
                 elif self.num_frames == 29:
-                    print("[STATUS] calibration successfull...")
+                    print("[STATUS] calibrated successfully...")
             else:
                 hand = segment(self.bg, gray)
 
