@@ -1,7 +1,10 @@
+from PIL import Image
+
 import numpy as np
 import torch
 import torchvision
 import cv2
+from torchvision import transforms
 
 from cvauth.hand_detection.models.handboxes import HandBoxes
 
@@ -48,7 +51,7 @@ def load_model(model, pretrained_path, load_to_cpu):
 def prepare_hand_localizer():
     model = torchvision.models.resnet18()
     model.fc = torch.nn.Linear(512, 8)
-    model.load_state_dict(torch.load("/home/user/Desktop/webcam_app/gestures/best_model_2.pth"))
+    model.load_state_dict(torch.load("/home/user/Desktop/webcam_app/gestures/best_model_4.pth"))
     model.cuda()
     model.eval()
     return model
@@ -103,10 +106,22 @@ def segment_deprecated(bg, image, threshold=30):
 
 
 def rec_gesture(model, image):
-    image = np.transpose(image, (2, 0, 1)) / 255
+    image = Image.fromarray(image)
 
-    image = torch.from_numpy(image)
-    image = image.type(torch.FloatTensor)
+    data_transform = transforms.Compose([
+        transforms.RandomAffine(25,
+                                (0.15, 0.15),
+                                (0.7, 1.1)),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor()
+    ])
+
+    image = data_transform(image)
+
+    #image = np.transpose(image, (2, 0, 1)) / 255
+
+    #image = torch.from_numpy(image)
+    #image = image.type(torch.FloatTensor)
 
     output = model(image[None, :, :].cuda())
 
