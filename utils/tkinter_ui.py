@@ -16,6 +16,7 @@ from utils.fps_plt import add_fps_plot
 
 
 # TODO fix titles
+# TODO disable input field
 
 
 class MainApp(tk.Tk):

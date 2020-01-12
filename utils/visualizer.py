@@ -41,8 +41,8 @@ def load_pose_estim(args):
     return VisualizationDemo(cfg)
 
 
-def load_hand_rec(args, device):
-    return prepare_hand_localizer(args.trained_model, args.cpu, device)
+def load_hand_rec():
+    return prepare_hand_localizer()
 
 
 class Visualizer:
@@ -69,13 +69,10 @@ class Visualizer:
             self.detectron = load_pose_estim(self.args)
             print('Pose estimator is loaded!')
 
-        if self.if_hand:
-            # self.init_hand()
-            pass
+        if not self.if_hand:
+            self.gestures_model = load_hand_rec()
+            print('Gesture classifier is loaded!')
 
-    def init_hand(self):
-        self.hand_localizer = load_hand_rec(self.args, self.conf.device)
-        print('Hand localizer is loaded!')
 
     def run(self, frame, username):
 
@@ -118,33 +115,14 @@ class Visualizer:
                 elif self.num_frames == 29:
                     print("[STATUS] calibrated successfully...")
             else:
-                hand = segment(self.bg, gray)
+                thresholded = segment(self.bg, gray)
 
-                if hand is not None:
-                    thresholded, segmented = hand
+                thresholded = np.stack((thresholded,) * 3, axis=-1)
 
-                    #thresholded = 255 - thresholded
-                    #thresholded /= 255
+                pred_num, pred_label = rec_gesture(self.gestures_model, thresholded)
+                print(pred_label)
 
-                    thresholded = np.stack((thresholded,) * 3, axis=-1)
-                    #print(thresholded.max())
-                    #print(vis.max())
-                    vis[self.hand_box[0]:self.hand_box[2], self.hand_box[1]:self.hand_box[3]] = thresholded
-                    #print(vis.max())
-                    # vis = cv2.drawContours(vis, [segmented + (self.hand_box[1], self.hand_box[0])], -1, (0, 0, 0))
-
-                    '''for size in [5]:  # [3, 5, 7, 9]:
-                        for iter in [1]:  # range(1, 3):
-                            closing = cv2.morphologyEx(thresholded,
-                                                       cv2.MORPH_CLOSE,
-                                                       np.ones((size, size), np.uint8),
-                                                       iterations=iter)
-                            cv2.imshow("{}-size {}-iter".format(size, iter), closing)'''
-
-                    # cv2.imshow("Thresholded", thresholded)
-                else:
-                    pass
-                    # vis[self.hand_box[0]:self.hand_box[2], self.hand_box[1]:self.hand_box[3]] = 255
+                vis[self.hand_box[0]:self.hand_box[2], self.hand_box[1]:self.hand_box[3]] = thresholded
 
             vis = cv2.rectangle(vis, (self.hand_box[3], self.hand_box[0]), (self.hand_box[1], self.hand_box[2]),
                                 (0, 255, 0), 2)

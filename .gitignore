@@ -1,3 +1,6 @@
+#gestures database
+gestures/gesture_data
+
 #arcface weights
 cvauth/arcface/work_space/save/*
 !cvauth/arcface/work_space/save/.gitkeep

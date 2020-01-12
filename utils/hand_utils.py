@@ -1,7 +1,13 @@
+import numpy as np
 import torch
+import torchvision
 import cv2
 
 from cvauth.hand_detection.models.handboxes import HandBoxes
+
+# gestures_dict = ('fist', 'five_fingers', 'four_fingers', 'ok', 'one_finger', 'three_fingers', 'two_fingers')
+
+gestures_dict = ('fist', 'five_fingers', 'four_fingers', 'noise', 'ok', 'one_finger', 'three_fingers', 'two_fingers')
 
 
 def check_keys(model, pretrained_state_dict):
@@ -39,12 +45,13 @@ def load_model(model, pretrained_path, load_to_cpu):
     return model
 
 
-def prepare_hand_localizer(trained_model, cpu, device):
-    hand_localizer = HandBoxes(phase='test', size=None, num_classes=2)
-    hand_localizer = load_model(hand_localizer, trained_model, cpu)
-    hand_localizer = hand_localizer.to(device)
-    hand_localizer.eval()
-    return hand_localizer
+def prepare_hand_localizer():
+    model = torchvision.models.resnet18()
+    model.fc = torch.nn.Linear(512, 8)
+    model.load_state_dict(torch.load("/home/user/Desktop/webcam_app/gestures/best_model_2.pth"))
+    model.cuda()
+    model.eval()
+    return model
 
 
 def visualize_hand(vis, dets):
@@ -62,7 +69,7 @@ def visualize_hand(vis, dets):
 
 
 def run_avg(bg, image, aWeight):
-    #global bg
+    # global bg
     if bg is None:
         bg = image.copy().astype("float")
         return bg
@@ -72,7 +79,15 @@ def run_avg(bg, image, aWeight):
 
 
 def segment(bg, image, threshold=30):
-    #global bg
+    diff = cv2.absdiff(bg.astype("uint8"), image)
+
+    thresholded = cv2.threshold(diff, threshold, 255, cv2.THRESH_BINARY)[1]
+
+    return thresholded
+
+
+def segment_deprecated(bg, image, threshold=30):
+    # global bg
     diff = cv2.absdiff(bg.astype("uint8"), image)
 
     thresholded = cv2.threshold(diff, threshold, 255, cv2.THRESH_BINARY)[1]
@@ -83,5 +98,20 @@ def segment(bg, image, threshold=30):
         return
     else:
         segmented = max(cnts, key=cv2.contourArea)
-        #print(segmented)
+        # print(segmented)
         return thresholded, segmented
+
+
+def rec_gesture(model, image):
+    image = np.transpose(image, (2, 0, 1)) / 255
+
+    image = torch.from_numpy(image)
+    image = image.type(torch.FloatTensor)
+
+    output = model(image[None, :, :].cuda())
+
+    out_num = int(torch.argmax(output))
+
+    label = gestures_dict[out_num]
+
+    return out_num, label
