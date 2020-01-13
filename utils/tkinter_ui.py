@@ -157,10 +157,19 @@ class StartPage(tk.Frame):
         button_signup.place(relx=.71, rely=.55, anchor="c")
 
     def process_name(self):
-        global username
+        global username, true_gesture_id
         username = self.message.get().lower()
-        if username in self.facebank_names:
+
+        names_list = [name[:-2] for name in self.facebank_names]
+
+        if username in names_list:
+            name_idx = names_list.index(username)
+            user_info = self.facebank_names[name_idx]
+            true_gesture_id = int(user_info[-1])
+            username = user_info[:-2]
+            #print(username, true_gesture_id)
             self.controller.show_frame("AuthPage")
+
         else:
             self.controller.title("Wrong name")
 
@@ -169,8 +178,8 @@ class StartPage(tk.Frame):
         username = self.message.get().lower()
         if username in self.facebank_names:
             self.controller.title("This user already exists!")
-        elif username.strip():
-            self.controller.show_frame("RegisterPage")
+        elif '$' not in username and username.strip():
+            self.controller.show_frame("GestureRegPage")
         else:
             self.controller.title("Invalid name")
 
@@ -236,7 +245,7 @@ class AuthPage(tk.Frame):
 
         self.gest_res = 0
 
-        self.true_gest_id = 2
+        self.true_gest_id = true_gesture_id
 
         self.sleep_time = 0
         self.seconds_left = 5
@@ -304,6 +313,7 @@ class AuthPage(tk.Frame):
                 self.controller.title("Wrong gesture!")
             elif self.pos_gest_cnt == 5:
                 self.gest_res = 1
+                self.raise_stop_flag()
                 self.controller.title("Authorized successfully!")
         # --------------------------
 
@@ -323,6 +333,81 @@ class AuthPage(tk.Frame):
         self.cap.release()
 
         self.controller.show_frame("StartPage")
+
+
+class GestureRegPage(tk.Frame):
+
+    def __init__(self, args, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+        load = Image.open(
+            "/home/user/Desktop/webcam_app/gestures/gesture_data/fist/2020-01-12-13-48-02.866400.jpg")
+        render = ImageTk.PhotoImage(load)
+        img = Label(self, image=render)
+        img.image = render
+        img.bind("<Button-1>", lambda e: self.choose_gesture(0))
+        img.place(x=0, y=0)
+
+        load = Image.open(
+            "/home/user/Desktop/webcam_app/gestures/gesture_data/ok/2020-01-12-13-47-03.916938.jpg")
+        render = ImageTk.PhotoImage(load)
+        img = Label(self, image=render)
+        img.image = render
+        img.bind("<Button-1>", lambda e: self.choose_gesture(4))
+        img.place(x=0, y=200)
+
+        load = Image.open(
+            "/home/user/Desktop/webcam_app/gestures/gesture_data/five_fingers/2020-01-12-13-45-53.772685.jpg")
+        render = ImageTk.PhotoImage(load)
+        img = Label(self, image=render)
+        img.image = render
+        img.bind("<Button-1>", lambda e: self.choose_gesture(1))
+        img.place(x=400, y=200)
+
+        load = Image.open(
+            "/home/user/Desktop/webcam_app/gestures/gesture_data/four_fingers/2020-01-13-00-28-55.789089.jpg")
+        render = ImageTk.PhotoImage(load)
+        img = Label(self, image=render)
+        img.image = render
+        img.bind("<Button-1>", lambda e: self.choose_gesture(2))
+        img.place(x=200, y=200)
+
+        load = Image.open(
+            "/home/user/Desktop/webcam_app/gestures/gesture_data/one_finger/2020-01-12-13-41-26.204770.jpg")
+        render = ImageTk.PhotoImage(load)
+        img = Label(self, image=render)
+        img.image = render
+        img.bind("<Button-1>", lambda e: self.choose_gesture(5))
+        img.place(x=200, y=0)
+
+        load = Image.open(
+            "/home/user/Desktop/webcam_app/gestures/gesture_data/three_fingers/2020-01-12-13-44-01.981331.jpg")
+        render = ImageTk.PhotoImage(load)
+        img = Label(self, image=render)
+        img.image = render
+        img.bind("<Button-1>", lambda e: self.choose_gesture(6))
+        img.place(x=600, y=0)
+
+        load = Image.open(
+            "/home/user/Desktop/webcam_app/gestures/gesture_data/two_fingers/2020-01-12-13-43-22.381874.jpg")
+        render = ImageTk.PhotoImage(load)
+        img = Label(self, image=render)
+        img.image = render
+        img.bind("<Button-1>", lambda e: self.choose_gesture(7))
+        img.place(x=400, y=0)
+
+    def choose_gesture(self, gesture_id):
+        global true_gesture_id
+
+        gestures_dict = (
+            'Fist', 'Five fingers', 'Four fingers', 'noise', 'Ok', 'One finger', 'Three fingers', 'Two fingers')
+
+        true_gesture_id = gesture_id
+        # self.controller.args['true_gesture_id'] = gesture_id
+        self.controller.title(f"You've chosen \'{gestures_dict[gesture_id]}\' gesture")
+        self.controller.show_frame("RegisterPage")
+    #
 
 
 class RegisterPage(tk.Frame):
@@ -356,9 +441,9 @@ class RegisterPage(tk.Frame):
                             padx="20",
                             pady="10",
                             font="16")
-        button_cap.place(relx=0.2, rely=0.961, anchor="c")
+        # button_cap.place(relx=0.2, rely=0.961, anchor="c")
 
-        self.registrator = Registrator(username)
+        self.registrator = Registrator(username, true_gesture_id)
 
         self.init_capture()
 

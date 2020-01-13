@@ -64,6 +64,7 @@ class Visualizer:
 
         if self.if_face:
             self.detector, self.learner, self.targets, self.names = load_face_rec(self.conf, self.args)
+            self.names = [name[:-2] for name in self.names]
             print('Face detector is loaded!')
 
         if self.if_pose:
