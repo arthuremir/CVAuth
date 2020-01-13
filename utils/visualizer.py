@@ -50,6 +50,7 @@ class Visualizer:
     def __init__(self, args, if_face, if_pose, if_hand):
         self.if_face = if_face.get()
         self.if_pose = if_pose.get()
+        self.if_pose_init = if_pose.get()
         self.if_hand = if_hand.get()
 
         self.conf = get_config(False)
@@ -73,10 +74,11 @@ class Visualizer:
             self.gestures_model = load_hand_rec()
             print('Gesture classifier is loaded!')
 
-
     def run(self, frame, username):
 
+        calibration_status = 0
         face_status = 0
+        gesture_num = -1
 
         if self.if_pose:
             _, vis = self.detectron.run_on_image(frame)
@@ -114,13 +116,15 @@ class Visualizer:
                     print("[STATUS] please wait! calibrating...")
                 elif self.num_frames == 29:
                     print("[STATUS] calibrated successfully...")
+                    calibration_status = 1
+                    self.if_pose = self.if_pose_init
             else:
                 thresholded = segment(self.bg, gray)
 
                 thresholded = np.stack((thresholded,) * 3, axis=-1)
 
-                pred_num, pred_label = rec_gesture(self.gestures_model, thresholded)
-                print(pred_label)
+                gesture_num, pred_label = rec_gesture(self.gestures_model, thresholded)
+                # print(pred_label)
 
                 vis[self.hand_box[0]:self.hand_box[2], self.hand_box[1]:self.hand_box[3]] = thresholded
 
@@ -133,4 +137,7 @@ class Visualizer:
             if hand_bboxes is not None:
                 vis = visualize_hand(vis, hand_bboxes)'''
 
-        return vis.get() if isinstance(vis, type(cv2.UMat())) else np.array(vis, dtype=np.uint8), face_status
+        return vis.get() if isinstance(vis, type(cv2.UMat())) else np.array(vis, dtype=np.uint8), \
+               face_status, \
+               gesture_num, \
+               calibration_status

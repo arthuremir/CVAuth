@@ -1,14 +1,9 @@
 from PIL import Image
 
-import numpy as np
 import torch
 import torchvision
 import cv2
 from torchvision import transforms
-
-from cvauth.hand_detection.models.handboxes import HandBoxes
-
-# gestures_dict = ('fist', 'five_fingers', 'four_fingers', 'ok', 'one_finger', 'three_fingers', 'two_fingers')
 
 gestures_dict = ('fist', 'five_fingers', 'four_fingers', 'noise', 'ok', 'one_finger', 'three_fingers', 'two_fingers')
 
@@ -51,7 +46,7 @@ def load_model(model, pretrained_path, load_to_cpu):
 def prepare_hand_localizer():
     model = torchvision.models.resnet18()
     model.fc = torch.nn.Linear(512, 8)
-    model.load_state_dict(torch.load("gestures/resnet18_gest.pth"))
+    model.load_state_dict(torch.load("gestures/gesture_data/resnet18_gest.pth"))
     model.cuda()
     model.eval()
     return model

@@ -102,7 +102,7 @@ class StartPage(tk.Frame):
                                   bg='#E35420',
                                   activebackground='#E95420',
                                   font=('Helvetica', 15))
-        face_chk.place(relx=.38, rely=.35, anchor="c")
+        # face_chk.place(relx=.38, rely=.35, anchor="c")
 
         if_pose = tk.IntVar()
         pose_chk = tk.Checkbutton(self,
@@ -115,7 +115,7 @@ class StartPage(tk.Frame):
                                   activebackground='#E95420',
                                   font=('Helvetica', 15),
                                   )
-        pose_chk.place(relx=.38, rely=.45, anchor="c")
+        pose_chk.place(relx=.38, rely=.55, anchor="c")  # change rely to 0.45
 
         if_hand = tk.IntVar()
         hand_chk = tk.Checkbutton(self,
@@ -127,7 +127,7 @@ class StartPage(tk.Frame):
                                   bg='#E35420',
                                   activebackground='#E95420',
                                   font=('Helvetica', 15))
-        hand_chk.place(relx=.38, rely=.55, anchor="c")
+        # hand_chk.place(relx=.38, rely=.55, anchor="c")
 
         button_signin = Button(self,
                                text="Sign in",
@@ -231,6 +231,17 @@ class AuthPage(tk.Frame):
 
         self.face_res = 0
 
+        self.pos_gest_cnt = 0
+        self.neg_gest_cnt = 0
+
+        self.gest_res = 0
+
+        self.true_gest_id = 2
+
+        self.sleep_time = 0
+        self.seconds_left = 5
+        self.calibration_status = 0
+
         self.update_cam()
 
     def update_cam(self):
@@ -249,8 +260,21 @@ class AuthPage(tk.Frame):
         _, frame = self.cap.read()
         frame = cv2.flip(frame, 1)
 
-        vis, face_status = self.visualizer.run(frame, username)
+        vis, face_status, gesture_id, calibration_status = self.visualizer.run(frame, username)
 
+        if calibration_status:
+            self.calibration_status = 1
+            self.controller.title("You have {} seconds to show the gesture to the area!".format(self.seconds_left))
+            self.sleep_time = time.time()
+            self.time_from_last = time.time()
+
+        if self.calibration_status and self.seconds_left > 0:
+            if time.time() - self.time_from_last > 1:
+                self.seconds_left -= 1
+                self.time_from_last = time.time()
+                self.controller.title("You have {} seconds to show the gesture to the area!".format(self.seconds_left))
+
+        # ------------------------ decision making
         if not self.face_res:
 
             if face_status == 1:
@@ -263,16 +287,25 @@ class AuthPage(tk.Frame):
                 self.controller.title("Wrong person!")
             elif self.pos_face_cnt == 3:
                 self.face_res = 1
-                self.pos_face_cnt = None
                 self.visualizer.if_face = 0
+                self.visualizer.if_pose = 0
                 self.visualizer.if_hand = 1
                 self.controller.title("Let's start gesture verification step!")
-                #self.visualizer.init_hand()
 
-        else:
-            pass
+        elif time.time() - self.sleep_time > 5 and gesture_id != -1:
+            if gesture_id == self.true_gest_id:
+                self.pos_gest_cnt += 1
+            else:
+                if gesture_id != 3:
+                    self.neg_gest_cnt += 1
 
-        # vis = add_fps_plot(vis)
+            if self.neg_gest_cnt == 5:
+                self.raise_stop_flag()
+                self.controller.title("Wrong gesture!")
+            elif self.pos_gest_cnt == 5:
+                self.gest_res = 1
+                self.controller.title("Authorized successfully!")
+        # --------------------------
 
         img = Image.fromarray(vis)
         img_tk = ImageTk.PhotoImage(image=img)
