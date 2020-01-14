@@ -45,4 +45,3 @@ transforms.Compose([
 Использованные библиотеки:
 - https://github.com/facebookresearch/detectron2
 - https://github.com/TreB1eN/InsightFace_Pytorch
-- https://github.com/zllrunning/hand-detection.PyTorch
