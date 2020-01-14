@@ -26,16 +26,17 @@
 Шум (нет жеста) - 102<br>
 
 
-Аугментации:<br>
-<code>transforms.Compose([<br>
-&nbsp;&nbsp;&nbsp;&nbsp;transforms.RandomAffine(25,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(0.15, 0.15),<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(0.7, 1.1)),<br>
-&nbsp;&nbsp;&nbsp;&nbsp;transforms.RandomHorizontalFlip(),<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;transforms.ToTensor()<br>
-])
-</code>
-<br><br>
+Аугментации:
+```
+transforms.Compose([
+    transforms.RandomAffine(25,
+                           (0.15, 0.15),
+                           (0.7, 1.1)),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor()
+]) 
+```
+
 
 Точность классификации жестов порядка 95% (ошибки в основном в неочевидных случаях в классе "шум")
 
