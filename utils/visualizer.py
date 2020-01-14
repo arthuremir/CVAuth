@@ -28,7 +28,8 @@ def load_face_rec(conf, args):
     if args.update or os.path.exists(DIRTY_FLAG):
         targets, names = prepare_facebank(conf, learner.model, detector, tta=args.tta)
         print('Facebank is updated!')
-        os.remove(DIRTY_FLAG)
+        if os.path.exists(DIRTY_FLAG):
+            os.remove(DIRTY_FLAG)
     else:
         targets, names = load_facebank(conf)
         print('Facebank is loaded!')
