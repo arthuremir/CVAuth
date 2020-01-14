@@ -21,7 +21,7 @@ class Registrator:
         self.save_path = SAVE_FOLDER / (username + "$" + str(true_gesture_id))
         os.mkdir(self.save_path)
         self.mtcnn = MTCNN()
-        print('MTCNN loaded!')
+        print('MTCNN is loaded!')
         self.time_from_last = 0
 
     def run(self, frame, capture_flag):

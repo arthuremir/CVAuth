@@ -21,7 +21,7 @@ class FaceLearner(object):
         #print(conf)
         if conf.use_mobilfacenet:
             self.model = MobileFaceNet(conf.embedding_size).to(conf.device)
-            print('MobileFaceNet model generated')
+            print('MobileFaceNet model is generated')
         else:
             self.model = Backbone(conf.net_depth, conf.drop_ratio, conf.net_mode).to(conf.device)
             print('{}_{} model generated'.format(conf.net_mode, conf.net_depth))
@@ -34,7 +34,7 @@ class FaceLearner(object):
             self.step = 0
             self.head = Arcface(embedding_size=conf.embedding_size, classnum=self.class_num).to(conf.device)
 
-            print('two model heads generated')
+            print('two model heads are generated')
 
             paras_only_bn, paras_wo_bn = separate_bn_paras(self.model)
 

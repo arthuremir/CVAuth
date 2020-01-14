@@ -22,7 +22,7 @@ if __name__ == '__main__':
     conf = get_config(False)
 
     mtcnn = MTCNN()
-    print('mtcnn loaded')
+    print('mtcnn is loaded')
 
     learner = face_learner(conf, True)
     learner.threshold = args.threshold
@@ -35,10 +35,10 @@ if __name__ == '__main__':
 
     if args.update:
         targets, names = prepare_facebank(conf, learner.model, mtcnn, tta=args.tta)
-        print('facebank updated')
+        print('facebank is updated')
     else:
         targets, names = load_facebank(conf)
-        print('facebank loaded')
+        print('facebank is loaded')
 
     #cap = cv2.VideoCapture(str(conf.facebank_path / args.file_name))
     cap = cv2.VideoCapture(0)

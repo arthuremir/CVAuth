@@ -167,7 +167,7 @@ class StartPage(tk.Frame):
             user_info = self.facebank_names[name_idx]
             true_gesture_id = int(user_info[-1])
             username = user_info[:-2]
-            #print(username, true_gesture_id)
+            # print(username, true_gesture_id)
             self.controller.show_frame("AuthPage")
 
         else:
@@ -341,61 +341,63 @@ class GestureRegPage(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
+        self.controller.title("Please, choose a gesture")
+
         load = Image.open(
             "/home/user/Desktop/webcam_app/gestures/gesture_data/fist/2020-01-12-13-48-02.866400.jpg")
-        render = ImageTk.PhotoImage(load)
+        render = ImageTk.PhotoImage(load.resize((160, 160)))
         img = Label(self, image=render)
         img.image = render
         img.bind("<Button-1>", lambda e: self.choose_gesture(0))
-        img.place(x=0, y=0)
-
-        load = Image.open(
-            "/home/user/Desktop/webcam_app/gestures/gesture_data/ok/2020-01-12-13-47-03.916938.jpg")
-        render = ImageTk.PhotoImage(load)
-        img = Label(self, image=render)
-        img.image = render
-        img.bind("<Button-1>", lambda e: self.choose_gesture(4))
-        img.place(x=0, y=200)
-
-        load = Image.open(
-            "/home/user/Desktop/webcam_app/gestures/gesture_data/five_fingers/2020-01-12-13-45-53.772685.jpg")
-        render = ImageTk.PhotoImage(load)
-        img = Label(self, image=render)
-        img.image = render
-        img.bind("<Button-1>", lambda e: self.choose_gesture(1))
-        img.place(x=400, y=200)
-
-        load = Image.open(
-            "/home/user/Desktop/webcam_app/gestures/gesture_data/four_fingers/2020-01-13-00-28-55.789089.jpg")
-        render = ImageTk.PhotoImage(load)
-        img = Label(self, image=render)
-        img.image = render
-        img.bind("<Button-1>", lambda e: self.choose_gesture(2))
-        img.place(x=200, y=200)
-
-        load = Image.open(
-            "/home/user/Desktop/webcam_app/gestures/gesture_data/one_finger/2020-01-12-13-41-26.204770.jpg")
-        render = ImageTk.PhotoImage(load)
-        img = Label(self, image=render)
-        img.image = render
-        img.bind("<Button-1>", lambda e: self.choose_gesture(5))
-        img.place(x=200, y=0)
+        img.place(x=40, y=10)
 
         load = Image.open(
             "/home/user/Desktop/webcam_app/gestures/gesture_data/three_fingers/2020-01-12-13-44-01.981331.jpg")
-        render = ImageTk.PhotoImage(load)
+        render = ImageTk.PhotoImage(load.resize((160, 160)))
         img = Label(self, image=render)
         img.image = render
         img.bind("<Button-1>", lambda e: self.choose_gesture(6))
-        img.place(x=600, y=0)
+        img.place(x=40, y=180)
+
+        load = Image.open(
+            "/home/user/Desktop/webcam_app/gestures/gesture_data/five_fingers/2020-01-12-13-45-53.772685.jpg")
+        render = ImageTk.PhotoImage(load.resize((160, 160)))
+        img = Label(self, image=render)
+        img.image = render
+        img.bind("<Button-1>", lambda e: self.choose_gesture(1))
+        img.place(x=440, y=180)
+
+        load = Image.open(
+            "/home/user/Desktop/webcam_app/gestures/gesture_data/four_fingers/2020-01-13-00-28-55.789089.jpg")
+        render = ImageTk.PhotoImage(load.resize((160, 160)))
+        img = Label(self, image=render)
+        img.image = render
+        img.bind("<Button-1>", lambda e: self.choose_gesture(2))
+        img.place(x=240, y=180)
+
+        load = Image.open(
+            "/home/user/Desktop/webcam_app/gestures/gesture_data/one_finger/2020-01-12-13-41-26.204770.jpg")
+        render = ImageTk.PhotoImage(load.resize((160, 160)))
+        img = Label(self, image=render)
+        img.image = render
+        img.bind("<Button-1>", lambda e: self.choose_gesture(5))
+        img.place(x=240, y=10)
+
+        load = Image.open(
+            "/home/user/Desktop/webcam_app/gestures/gesture_data/ok/2020-01-12-13-47-03.916938.jpg")
+        render = ImageTk.PhotoImage(load.resize((160, 160)))
+        img = Label(self, image=render)
+        img.image = render
+        img.bind("<Button-1>", lambda e: self.choose_gesture(4))
+        img.place(x=240, y=350)
 
         load = Image.open(
             "/home/user/Desktop/webcam_app/gestures/gesture_data/two_fingers/2020-01-12-13-43-22.381874.jpg")
-        render = ImageTk.PhotoImage(load)
+        render = ImageTk.PhotoImage(load.resize((160, 160)))
         img = Label(self, image=render)
         img.image = render
         img.bind("<Button-1>", lambda e: self.choose_gesture(7))
-        img.place(x=400, y=0)
+        img.place(x=440, y=10)
 
     def choose_gesture(self, gesture_id):
         global true_gesture_id

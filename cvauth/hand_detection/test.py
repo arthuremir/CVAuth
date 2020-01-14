@@ -96,7 +96,7 @@ if __name__ == '__main__':
     localizer = load_model(localizer, args.trained_model, args.cpu)
     localizer = localizer.to(device)
     localizer.eval()
-    print('Localizer loaded!')
+    print('Localizer is loaded!')
 
     '''CLASSIFIER_WPATH = "weights/best_model.pth"
     classifier = load_rn18_pretrained(CLASSIFIER_WPATH, 24)
